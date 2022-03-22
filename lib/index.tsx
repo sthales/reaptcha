@@ -214,7 +214,7 @@ class Reaptcha extends Component<Props, State> {
           size: this.props.size,
           badge: this.state.invisible ? this.props.badge : undefined,
           tabindex: this.props.tabindex,
-          callback: this.props.onVerify,
+          callback: this.handleChange,
           'expired-callback': this.props.onExpire,
           'error-callback': this.props.onError,
           isolated: this.state.invisible ? this.props.isolated : undefined,
@@ -264,6 +264,14 @@ class Reaptcha extends Component<Props, State> {
     });
   };
 
+  executeAsync = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      this.executionResolve = resolve;
+      this.executionReject = reject;
+      this._executeRecaptcha();
+    });
+  }
+
   getResponse = (): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (this.state.rendered) {
@@ -273,6 +281,17 @@ class Reaptcha extends Component<Props, State> {
       reject(new Error('This recaptcha instance did not render yet.'));
     });
   };
+
+  handleChange(token) {
+    if (this.props.onVerify) {
+      this.props.onVerify(token);
+    }
+    if (this.executionResolve) {
+      this.executionResolve(token);
+      delete this.executionReject;
+      delete this.executionResolve;
+    }
+  }
 
   render = () => {
     const container = (
