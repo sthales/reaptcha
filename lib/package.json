@@ -4,7 +4,7 @@
   "description": "Google reCAPTCHA for React",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sarneeh/reaptcha"
+    "url": "https://github.com/sthales/reaptcha"
   },
   "license": "MIT",
   "author": "Jakub Sarnowski <hello@jsarnowski.com>",
