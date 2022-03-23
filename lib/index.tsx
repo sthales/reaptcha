@@ -38,6 +38,7 @@ export type RenderProps = {
   reset: () => Promise<void>;
   execute: () => Promise<void>;
   getResponse: () => Promise<string>;
+  executeAsync: () => Promise<string>;
   recaptchaComponent: ReactNode;
 };
 
@@ -106,6 +107,11 @@ class Reaptcha extends Component<Props, State> {
     }
     return null;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  executionResolve = (value: any): void => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  executionReject = (): void => {};
 
   _isAvailable = (): boolean => Boolean(window.grecaptcha?.ready);
 
@@ -264,13 +270,13 @@ class Reaptcha extends Component<Props, State> {
     });
   };
 
-  executeAsync = (): Promise<void> => {
+  executeAsync = (): Promise<string> => {
     return new Promise((resolve, reject) => {
       this.executionResolve = resolve;
       this.executionReject = reject;
       this._executeRecaptcha();
     });
-  }
+  };
 
   getResponse = (): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -282,13 +288,15 @@ class Reaptcha extends Component<Props, State> {
     });
   };
 
-  handleChange(token) {
+  handleChange(token: string) {
     if (this.props.onVerify) {
       this.props.onVerify(token);
     }
     if (this.executionResolve) {
       this.executionResolve(token);
+      // @ts-expect-error Aqui vai ocorrer um erro, mas estou ignorando
       delete this.executionReject;
+      // @ts-expect-error Aqui vai ocorrer um erro, mas estou ignorando
       delete this.executionResolve;
     }
   }
@@ -309,7 +317,8 @@ class Reaptcha extends Component<Props, State> {
           reset: this.reset,
           execute: this.execute,
           getResponse: this.getResponse,
-          recaptchaComponent: container
+          recaptchaComponent: container,
+          executeAsync: this.executeAsync
         })
       : container;
   };
